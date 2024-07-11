@@ -9,18 +9,21 @@ function Home() {
   const [downloadError, setDownloadError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  const [fileHistory, setFileHistory] = useState([]); // State for file history
+  const [isDarkMode, setIsDarkMode] = useState(() => JSON.parse(localStorage.getItem("darkMode")) || false);
+  const [fileHistory, setFileHistory] = useState([]);
 
   useEffect(() => {
-    // Load file history from local storage on component mount
     const savedHistory = JSON.parse(localStorage.getItem("fileHistory")) || [];
     setFileHistory(savedHistory);
   }, []);
 
+  useEffect(() => {
+    localStorage.setItem("darkMode", JSON.stringify(isDarkMode));
+  }, [isDarkMode]);
+
   const handleFileChange = (e) => {
     setSelectedFile(e.target.files[0]);
-    setUploadProgress(0); // Reset progress when a new file is selected
+    setUploadProgress(0);
   };
 
   const handleSubmit = async (event) => {
@@ -36,7 +39,7 @@ function Home() {
     try {
       setIsLoading(true);
       const response = await axios.post(
-        "http://localhost:3000/convertFile",
+        process.env.REACT_APP_API_URL + "/convertFile",
         formData,
         {
           responseType: "blob",
@@ -61,7 +64,6 @@ function Home() {
       setDownloadError("");
       setConvert("File Converted Successfully");
 
-      // Save file to history
       const newFile = { name: fileName, url };
       const updatedHistory = [...fileHistory, newFile];
       setFileHistory(updatedHistory);
@@ -70,7 +72,7 @@ function Home() {
       if (error.response && error.response.status === 400) {
         setDownloadError("Error occurred: " + error.response.data.message);
       } else {
-        setConvert("");
+        setConvert("An error occurred. Please try again.");
       }
     } finally {
       setIsLoading(false);
@@ -97,7 +99,7 @@ function Home() {
   };
 
   return (
-    <div className={`max-w-screen-xl mx-auto container px-6 py-5 md:px-40 ${isDarkMode ? 'dark bg-slate-800 ' : 'light'}`}>
+    <div className={`max-w-screen-xl mx-auto container px-6 py-5 md:px-40 ${isDarkMode ? 'dark bg-slate-800' : 'light'}`}>
       <div className={`flex h-screen items-center justify-center ${isDarkMode ? 'dark-body' : 'light-body'}`}>
         <div className={`border-2 border-dashed px-4 py-2 md:px-8 md:py-6 border-indigo-400 rounded-lg shadow-lg ${isDarkMode ? 'dark-border border-blue-600' : 'light-border'}`}>
           <h1 className={`text-3xl font-bold text-center mb-4 ${isDarkMode ? 'text-white' : 'text-black'}`}>
@@ -146,7 +148,6 @@ function Home() {
               <div className={`text-red-500 text-center ${isDarkMode ? 'text-white' : 'text-black'}`}>{downloadError}</div>
             )}
 
-            {/* Dark mode toggle button */}
             <button
               onClick={toggleDarkMode}
               className={`text-white bg-gray-700 hover:bg-gray-900 duration-300 font-bold px-4 py-2 mb-2 rounded-lg mt-4 ${isDarkMode ? 'dark-button' : 'light-button'}`}
@@ -155,7 +156,6 @@ function Home() {
             </button>
           </div>
           
-          {/* File History Section */}
           <div className="mt-8 w-full">
             <h2 className={`text-xl font-bold text-center mb-4 ${isDarkMode ? 'text-white' : 'text-black'}`}>
               File History
