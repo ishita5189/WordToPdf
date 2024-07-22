@@ -5,7 +5,7 @@ import { ProgressBar } from 'react-bootstrap';
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import Footer from "./Footer";
-import { convertWordToPDF } from '../api'; // Import the API function
+import { convertWordToPDF } from '../api/api'' // Import the API function
 
 function Home() {
   const [selectedFile, setSelectedFile] = useState(null);
