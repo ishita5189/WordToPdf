@@ -1,10 +1,11 @@
+// src/components/Home.jsx
 import React, { useState, useEffect } from "react";
 import { FaFileWord } from "react-icons/fa6";
-import axios from "axios";
 import { ProgressBar } from 'react-bootstrap';
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import Footer from "./Footer";
+import { convertWordToPDF } from '../api/api'; // Import the API function
 
 function Home() {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -49,23 +50,12 @@ function Home() {
       return;
     }
 
-    const formData = new FormData();
-    formData.append("file", selectedFile);
-
     try {
       setIsLoading(true);
-      const response = await axios.post(
-        "http://localhost:3000/convertFile",
-        formData,
-        {
-          responseType: "blob",
-          onUploadProgress: (progressEvent) => {
-            const { loaded, total } = progressEvent;
-            const percentage = Math.floor((loaded * 100) / total);
-            setUploadProgress(percentage);
-          }
-        }
-      );
+      const response = await convertWordToPDF(selectedFile);
+      
+      // Update the progress based on response if needed
+      setUploadProgress(response.config.onUploadProgress ? response.config.onUploadProgress() : 100);
 
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");
