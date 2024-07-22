@@ -8,7 +8,13 @@ const fs = require("fs");
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use(cors());
+app.use(cors( {
+    origin: 'https://wordtopdf-converter.vercel.app/',
+    methods: ['POST,GET'],
+    credentials: true
+})
+);
+
 
 // Define a route for the root URL
 app.get("/", (req, res) => {
