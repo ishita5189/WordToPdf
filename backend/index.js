@@ -22,7 +22,7 @@ app.get("/", (req, res) => {
 });
 
 // setting up the file storage
-const storage = multer.diskStorage({
+const storage = multer.memoryStorage({
     destination: function(req, file, cb) {
         cb(null, "uploads");
     },
