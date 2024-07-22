@@ -9,7 +9,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(cors( {
-    origin: 'https://word-to-pdf-mern-frontend.vercel.app/',
+    origin: 'https://word-to-pdf-mern-frontend.vercel.app',
     methods: ['POST,GET'],
     credentials: true
 })
