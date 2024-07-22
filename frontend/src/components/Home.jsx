@@ -44,7 +44,7 @@ function Home() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    axios.post('https://wordtopdf-converter.vercel.app/')
+    axios.post('https://wordtopdf-converter.vercel.app')
     if (!selectedFile) {
       setConvert("Please select a file");
       return;
