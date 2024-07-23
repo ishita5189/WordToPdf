@@ -21,8 +21,8 @@ app.get("/", (req, res) => {
     res.send("Welcome to the File Conversion API");
 });
 
-// setting up the file storage
-const storage = multer.memoryStorage({
+// settting up the file storage
+const storage = multer.diskStorage({
     destination: function(req, file, cb) {
         cb(null, "uploads");
     },
