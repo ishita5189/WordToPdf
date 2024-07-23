@@ -55,7 +55,7 @@ function Home() {
     try {
       setIsLoading(true);
       const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/convertFile`,
+       "https://wordtopdf-converter.vercel.app/convertFile",
         formData,
         {
           responseType: "blob",
