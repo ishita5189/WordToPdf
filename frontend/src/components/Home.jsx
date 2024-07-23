@@ -55,7 +55,7 @@ function Home() {
     try {
       setIsLoading(true);
       const response = await axios.post(
-        "https://word-to-pdf-frontend.vercel.app/convertFile",
+        "https://wordtopdf-converter.vercel.app/convertFile",
         formData,
         {
           responseType: "blob",
@@ -87,7 +87,6 @@ function Home() {
 
       localStorage.setItem("fileHistory", JSON.stringify(updatedHistory));
     } catch (error) {
-      console.error("Upload Error:", error); // Add this line
       if (error.response && error.response.status === 400) {
         setDownloadError("Error occurred: " + error.response.data.message);
       } else {
