@@ -4,7 +4,6 @@ const cors = require("cors");
 const docxToPDF = require("docx-pdf");
 const path = require("path");
 const fs = require("fs");
-
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -34,6 +33,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 app.post("/convertFile", upload.single("file"), (req, res, next) => {
     try {
+        client.connect();
         if (!req.file) {
             return res.status(400).json({
                 message: "No file uploaded",
