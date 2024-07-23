@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "This is a convert app",
   "main": "index.js",
+  "proxy": "https://word-to-pdf-frontend.vercel.app",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon index.js"

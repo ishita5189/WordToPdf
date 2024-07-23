@@ -46,37 +46,39 @@ const upload = multer({
 });
 
 app.post("/convertFile", upload.single("file"), (req, res, next) => {
+    console.log("Received file:", req.file); // Log received file information
     try {
         if (!req.file) {
+            console.log("No file uploaded");
             return res.status(400).json({
                 message: "No file uploaded",
             });
         }
-        // Defining output file path
-        let outputPath = path.join(
-            filesDir,
-            `${req.file.originalname}.pdf`
-        );
+
+        let outputPath = path.join(__dirname, "files", `${req.file.originalname}.pdf`);
+        console.log("Output path:", outputPath); // Log the output path
+
         docxToPDF(req.file.path, outputPath, (err, result) => {
             if (err) {
-                console.log(err);
+                console.error("Error converting file:", err); // Log conversion errors
                 return res.status(500).json({
                     message: "Error converting docx to pdf",
                 });
             }
+
             res.download(outputPath, () => {
-                // Delete the file after download
-                fs.unlinkSync(outputPath);
+                fs.unlinkSync(outputPath); // Clean up the file
                 console.log("File downloaded and deleted");
             });
         });
     } catch (error) {
-        console.log(error);
+        console.error("Internal server error:", error); // Log internal errors
         res.status(500).json({
             message: "Internal server error",
         });
     }
 });
+
 
 app.listen(port, () => {
     console.log(`Server is listening on port ${port}`);
