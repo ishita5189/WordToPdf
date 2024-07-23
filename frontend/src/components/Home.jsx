@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FaFileWord } from "react-icons/fa";
+import { FaFileWord } from "react-icons/fa6";
 import axios from "axios";
 import { ProgressBar } from 'react-bootstrap';
 import JSZip from "jszip";
@@ -44,6 +44,7 @@ function Home() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    axios.post('https://wordtopdf-converter.vercel.app')
     if (!selectedFile) {
       setConvert("Please select a file");
       return;
@@ -170,64 +171,85 @@ function Home() {
             >
               {isLoading ? "Converting..." : "Convert File"}
             </button>
-            {uploadProgress > 0 && uploadProgress < 100 && (
-              <ProgressBar now={uploadProgress} label={`${uploadProgress}%`} className="mt-3 w-full" />
+            {isLoading && (
+              <ProgressBar
+                animated
+                now={uploadProgress}
+                label={`${uploadProgress}%`}
+                className="w-full mt-2"
+              />
             )}
             {convert && (
-              <p className={`text-center ${convert.includes('Error') ? 'text-red-500' : 'text-green-500'} font-semibold`}>
-                {convert}
-              </p>
+              <div className="text-green-500 text-center">{convert}</div>
             )}
             {downloadError && (
-              <p className="text-red-500 font-semibold">
-                {downloadError}
-              </p>
+              <div className="text-red-500 text-center">{downloadError}</div>
+            )}
+
+            <button
+              onClick={toggleDarkMode}
+              className="text-white bg-gray-700 hover:bg-gray-900 transition duration-300 font-bold px-4 py-1 rounded-lg mt-4"
+            >
+              {isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+            </button>
+            
+            <button
+              onClick={handleClearHistory}
+              className="text-white bg-red-500 hover:bg-red-700 transition duration-300 font-bold px-4 py-1 rounded-lg mt-4"
+            >
+              Clear History
+            </button>
+
+            {/* Conditionally render Download All Files button */}
+            {fileCount > 1 && (
+              <button
+                onClick={handleDownloadAll}
+                className="text-white bg-green-500 hover:bg-green-700 transition duration-300 font-bold px-4 py-1 rounded-lg mt-4"
+              >
+                Download All Files
+              </button>
             )}
           </div>
 
-          {fileHistory.length > 0 && (
-            <div className="mt-6">
-              <h2 className="text-xl font-bold mb-3">File History ({fileCount})</h2>
-              <ul className="space-y-2">
-                {fileHistory.map((file, index) => (
-                  <li key={index} className="flex items-center justify-between border-b pb-2">
-                    <span>{file.name}</span>
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => handleReDownload(file)}
-                        className="text-blue-500 hover:underline"
-                      >
-                        Re-download
-                      </button>
-                      <button
-                        onClick={() => handleDelete(index)}
-                        className="text-red-500 hover:underline"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-4 flex justify-between">
-                <button
-                  onClick={handleClearHistory}
-                  className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
-                >
-                  Clear History
-                </button>
-                <button
-                  onClick={handleDownloadAll}
-                  className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
-                >
-                  Download All
-                </button>
-              </div>
+          {/* File History and Counter */}
+          <div className="mt-8 w-full">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold">
+                File History
+              </h2>
+              {fileCount > 0 && (
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold ${isDarkMode ? 'bg-blue-500 text-white' : 'bg-blue-200 text-black'}`}>
+                  {fileCount}
+                </div>
+              )}
             </div>
-          )}
+            <ul className="flex flex-col items-center space-y-2">
+              {fileHistory.length > 0 ? fileHistory.map((file, index) => (
+                <li key={index} className={`flex justify-between w-full px-4 py-2 bg-gray-100 rounded-lg shadow-lg ${isDarkMode ? 'bg-gray-700 text-white' : 'bg-gray-100 text-black'}`}>
+                  <span>{file.name}</span>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => handleReDownload(file)}
+                      className="text-white bg-blue-500 hover:bg-blue-700 transition duration-300 font-bold px-2 py-1 rounded-lg"
+                    >
+                      Download
+                    </button>
+                    <button
+                      onClick={() => handleDelete(index)}
+                      className="text-white bg-red-500 hover:bg-red-700 transition duration-300 font-bold px-2 py-1 rounded-lg"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </li>
+              )) : (
+                <li className="text-center">No files converted yet.</li>
+              )}
+            </ul>
+          </div>
         </div>
       </div>
-      <Footer isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
+      <Footer isDarkMode={isDarkMode} />
     </div>
   );
 }

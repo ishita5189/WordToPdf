@@ -8,30 +8,29 @@ const fs = require("fs");
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use(cors( {
+app.use(cors({
     origin: '*',
-    methods: ['POST' , 'GET'],
+    methods: ['POST', 'GET'],
     credentials: true
-})
-);
-
+}));
 
 // Define a route for the root URL
 app.get("/", (req, res) => {
     res.send("Welcome to the File Conversion API");
 });
 
-// settting up the file storage
+// Setting up the file storage
 const storage = multer.diskStorage({
-    destination: function(req, file, cb) {
+    destination: function (req, file, cb) {
         cb(null, "uploads");
     },
-    filename: function(req, file, cb) {
+    filename: function (req, file, cb) {
         cb(null, file.originalname);
     },
 });
 
 const upload = multer({ storage: storage });
+
 app.post("/convertFile", upload.single("file"), (req, res, next) => {
     try {
         if (!req.file) {
@@ -43,7 +42,7 @@ app.post("/convertFile", upload.single("file"), (req, res, next) => {
         let outputPath = path.join(
             __dirname,
             "files",
-            `${req.file.originalname}.pdf`
+            `${path.parse(req.file.originalname).name}.pdf`
         );
         docxToPDF(req.file.path, outputPath, (err, result) => {
             if (err) {
