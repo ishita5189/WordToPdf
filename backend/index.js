@@ -8,30 +8,43 @@ const fs = require("fs");
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use(cors( {
+app.use(cors({
     origin: '*',
-    methods: ['POST','GET'],
+    methods: ['POST', 'GET'],
     credentials: true
-})
-);
+}));
 
+// Create necessary directories if they don't exist
+const uploadsDir = path.join(__dirname, 'uploads');
+const filesDir = path.join(__dirname, 'files');
+
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir);
+}
+if (!fs.existsSync(filesDir)) {
+    fs.mkdirSync(filesDir);
+}
 
 // Define a route for the root URL
 app.get("/", (req, res) => {
     res.send("Welcome to the File Conversion API");
 });
 
-// setting up the file storage
+// Setting up the file storage
 const storage = multer.diskStorage({
     destination: function(req, file, cb) {
-        cb(null, "uploads");
+        cb(null, uploadsDir);
     },
     filename: function(req, file, cb) {
         cb(null, file.originalname);
     },
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({
+    storage: storage,
+    limits: { fileSize: 20 * 1024 * 1024 } // 20 MB limit
+});
+
 app.post("/convertFile", upload.single("file"), (req, res, next) => {
     try {
         if (!req.file) {
@@ -41,8 +54,7 @@ app.post("/convertFile", upload.single("file"), (req, res, next) => {
         }
         // Defining output file path
         let outputPath = path.join(
-            __dirname,
-            "files",
+            filesDir,
             `${req.file.originalname}.pdf`
         );
         docxToPDF(req.file.path, outputPath, (err, result) => {
@@ -55,7 +67,7 @@ app.post("/convertFile", upload.single("file"), (req, res, next) => {
             res.download(outputPath, () => {
                 // Delete the file after download
                 fs.unlinkSync(outputPath);
-                console.log("file downloaded and deleted");
+                console.log("File downloaded and deleted");
             });
         });
     } catch (error) {
